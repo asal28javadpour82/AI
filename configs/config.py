@@ -58,3 +58,11 @@ CHECKPOINT_PATH = "outputs/checkpoints"
 FIGURE_PATH = "outputs/figures"
 
 LOG_PATH = "outputs/logs"
+
+# ===========================
+# OpenML Dataset
+# ===========================
+
+OPENML_DATASET_NAME = "adult"
+
+TARGET_COLUMN = "class"

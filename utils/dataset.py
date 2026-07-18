@@ -1,80 +1,95 @@
 """
-Dataset Loader
+Dataset Module
 --------------
-Loads, preprocesses and prepares tabular datasets.
+Load Adult Income dataset from local file and prepare train/validation/test splits.
+
+Author: Asal Javadpour
+Project: XTab-Lite
 """
+
+from pathlib import Path
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 
 
-class TabularDataset:
+class AdultDataset:
+    """
+    Adult Income Dataset Loader
+    """
 
-    def __init__(self, csv_path, target_column):
+    COLUMN_NAMES = [
+        "age",
+        "workclass",
+        "fnlwgt",
+        "education",
+        "education_num",
+        "marital_status",
+        "occupation",
+        "relationship",
+        "race",
+        "sex",
+        "capital_gain",
+        "capital_loss",
+        "hours_per_week",
+        "native_country",
+        "income"
+    ]
 
-        self.csv_path = csv_path
-        self.target_column = target_column
+    def __init__(self, data_path: str):
 
-        self.data = None
+        self.data_path = Path(data_path)
 
-        self.X = None
-        self.y = None
+        self.dataframe = None
 
-    def load_data(self):
+    def load(self):
 
-        self.data = pd.read_csv(self.csv_path)
+        self.dataframe = pd.read_csv(
 
-        return self.data
+            self.data_path,
 
-    def preprocess(self):
+            header=None,
 
-        df = self.data.copy()
+            names=self.COLUMN_NAMES,
 
-        # Encode categorical columns
-        for column in df.columns:
+            na_values=" ?",
 
-            if df[column].dtype == "object":
+            skipinitialspace=True
 
-                encoder = LabelEncoder()
+        )
 
-                df[column] = encoder.fit_transform(df[column])
+        return self.dataframe
 
-        self.X = df.drop(columns=[self.target_column])
+    def remove_missing_values(self):
 
-        self.y = df[self.target_column]
+        self.dataframe = self.dataframe.dropna()
 
-        return self.X, self.y
+        return self.dataframe
 
     def split(self):
 
-        X_train, X_test, y_train, y_test = train_test_split(
+        train_df, temp_df = train_test_split(
 
-            self.X,
-            self.y,
+            self.dataframe,
+
             test_size=0.30,
+
             random_state=42,
-            shuffle=True
+
+            stratify=self.dataframe["income"]
 
         )
 
-        X_valid, X_test, y_valid, y_test = train_test_split(
+        valid_df, test_df = train_test_split(
 
-            X_test,
-            y_test,
+            temp_df,
+
             test_size=0.50,
-            random_state=42
+
+            random_state=42,
+
+            stratify=temp_df["income"]
 
         )
 
-        return (
-
-            X_train,
-            X_valid,
-            X_test,
-
-            y_train,
-            y_valid,
-            y_test
-
-        )
+        return train_df, valid_df, test_df
