@@ -7,6 +7,8 @@ Author: Asal Javadpour
 Project: XTab_Project
 """
 
+import torch
+
 
 class Config:
 
@@ -29,6 +31,18 @@ class Config:
     NUM_NUMERIC_FEATURES = 6
 
     NUM_CATEGORICAL_FEATURES = 8
+
+    # Adult Dataset
+    CATEGORICAL_CARDINALITIES = [
+        9,
+        16,
+        7,
+        15,
+        6,
+        5,
+        2,
+        42,
+    ]
 
     # ==========================================
     # Training

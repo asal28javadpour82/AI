@@ -1,21 +1,20 @@
 """
-Dataset Module
---------------
-Load Adult Income dataset from local file and prepare train/validation/test splits.
+dataset.py
+----------
+Load Adult Income Dataset.
 
 Author: Asal Javadpour
-Project: XTab-Lite
+Project: XTab_Project
 """
 
 from pathlib import Path
 
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 
 class AdultDataset:
     """
-    Adult Income Dataset Loader
+    Adult Income Dataset Loader.
     """
 
     COLUMN_NAMES = [
@@ -33,63 +32,31 @@ class AdultDataset:
         "capital_loss",
         "hours_per_week",
         "native_country",
-        "income"
+        "income",
     ]
 
     def __init__(self, data_path: str):
 
         self.data_path = Path(data_path)
 
-        self.dataframe = None
+    def load(self) -> pd.DataFrame:
+        """
+        Load dataset from CSV file.
+        """
 
-    def load(self):
-
-        self.dataframe = pd.read_csv(
-
+        dataframe = pd.read_csv(
             self.data_path,
-
             header=None,
-
             names=self.COLUMN_NAMES,
-
             na_values=" ?",
-
-            skipinitialspace=True
-
+            skipinitialspace=True,
         )
 
-        return self.dataframe
+        dataframe = dataframe.dropna()
 
-    def remove_missing_values(self):
-
-        self.dataframe = self.dataframe.dropna()
-
-        return self.dataframe
-
-    def split(self):
-
-        train_df, temp_df = train_test_split(
-
-            self.dataframe,
-
-            test_size=0.30,
-
-            random_state=42,
-
-            stratify=self.dataframe["income"]
-
+        dataframe.reset_index(
+            drop=True,
+            inplace=True,
         )
 
-        valid_df, test_df = train_test_split(
-
-            temp_df,
-
-            test_size=0.50,
-
-            random_state=42,
-
-            stratify=temp_df["income"]
-
-        )
-
-        return train_df, valid_df, test_df
+        return dataframe

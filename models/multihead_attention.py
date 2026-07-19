@@ -63,6 +63,15 @@ class MultiHeadSelfAttention(nn.Module):
             embedding_dim,
             bias=True,
         )
+        nn.init.xavier_uniform_(self.query.weight)
+        nn.init.xavier_uniform_(self.key.weight)
+        nn.init.xavier_uniform_(self.value.weight)
+        nn.init.xavier_uniform_(self.output.weight)
+
+        nn.init.zeros_(self.query.bias)
+        nn.init.zeros_(self.key.bias)
+        nn.init.zeros_(self.value.bias)
+        nn.init.zeros_(self.output.bias)
 
         self.dropout = nn.Dropout(dropout)
 

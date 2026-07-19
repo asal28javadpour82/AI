@@ -31,7 +31,7 @@ class ClassificationHead(nn.Module):
                 embedding_dim
             ),
 
-            nn.ReLU(),
+            nn.GELU(),
 
             nn.Dropout(
                 dropout
