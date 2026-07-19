@@ -1,68 +1,68 @@
 """
-Project Configuration File
---------------------------
-XTab-Lite Project
-AI Laboratory Project
+config.py
+---------
+Central configuration file for the FT-Transformer project.
+
+Author: Asal Javadpour
+Project: XTab_Project
 """
 
-# ===========================
-# Dataset
-# ===========================
 
-DATASET_NAME = "Adult Income"
+class Config:
 
-TRAIN_RATIO = 0.7
-VALID_RATIO = 0.15
-TEST_RATIO = 0.15
+    # ==========================
+    # Random Seed
+    # ==========================
 
-RANDOM_SEED = 42
+    RANDOM_SEED = 42
 
-# ===========================
-# Training
-# ===========================
+    # ==========================
+    # Dataset
+    # ==========================
 
-BATCH_SIZE = 64
+    TEST_SIZE = 0.20
+    VALIDATION_SIZE = 0.10
 
-NUM_EPOCHS = 50
+    # ==========================
+    # Training
+    # ==========================
 
-LEARNING_RATE = 1e-3
+    BATCH_SIZE = 256
 
-WEIGHT_DECAY = 1e-5
+    EPOCHS = 50
 
-# ===========================
-# Model
-# ===========================
+    LEARNING_RATE = 1e-3
 
-EMBEDDING_DIM = 64
+    WEIGHT_DECAY = 1e-5
 
-NUM_HEADS = 8
+    # ==========================
+    # Model
+    # ==========================
 
-NUM_TRANSFORMER_LAYERS = 4
+    EMBEDDING_DIM = 32
 
-FFN_DIM = 256
+    NUM_HEADS = 8
 
-DROPOUT = 0.2
+    NUM_TRANSFORMER_BLOCKS = 3
 
-# ===========================
-# Device
-# ===========================
+    FFN_MULTIPLIER = 4
 
-DEVICE = "cuda"
+    DROPOUT = 0.10
 
-# ===========================
-# Save Paths
-# ===========================
+    # ==========================
+    # Early Stopping
+    # ==========================
 
-CHECKPOINT_PATH = "outputs/checkpoints"
+    PATIENCE = 10
 
-FIGURE_PATH = "outputs/figures"
+    # ==========================
+    # Device
+    # ==========================
 
-LOG_PATH = "outputs/logs"
+    DEVICE = "cpu"
 
-# ===========================
-# OpenML Dataset
-# ===========================
+    # ==========================
+    # Checkpoints
+    # ==========================
 
-OPENML_DATASET_NAME = "adult"
-
-TARGET_COLUMN = "class"
+    SAVE_MODEL_PATH = "outputs/checkpoints/best_model.pth"
