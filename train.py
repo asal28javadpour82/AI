@@ -23,7 +23,7 @@ from models.transformer import FTTransformer
 from utils.dataset import AdultDataset
 from utils.preprocessing import DataPreprocessor
 from utils.dataloader import create_dataloaders
-
+from utils.visualization import plot_training_history
 from evaluate import evaluate
 
 
@@ -88,8 +88,6 @@ dataset = AdultDataset(
 )
 
 dataframe = dataset.load()
-
-dataframe = dataset.remove_missing_values()
 
 
 # ==========================================
@@ -359,3 +357,208 @@ def validate(
     )
 
     return validation_loss, validation_accuracy
+# ==========================================
+# Training Function
+# ==========================================
+
+def train():
+
+    best_validation_loss = float("inf")
+
+    early_stop_counter = 0
+
+    train_losses = []
+
+    validation_losses = []
+
+    train_accuracies = []
+
+    validation_accuracies = []
+
+    for epoch in range(Config.EPOCHS):
+
+        print("\n" + "=" * 60)
+
+        print(f"Epoch [{epoch + 1}/{Config.EPOCHS}]")
+
+        print("=" * 60)
+
+        # --------------------------------------
+        # Train
+        # --------------------------------------
+
+        train_loss, train_accuracy = train_one_epoch(
+
+            model=model,
+
+            dataloader=train_loader,
+
+            criterion=criterion,
+
+            optimizer=optimizer,
+
+            device=device,
+
+        )
+
+        # --------------------------------------
+        # Validation
+        # --------------------------------------
+
+        validation_loss, validation_accuracy = validate(
+
+            model=model,
+
+            dataloader=valid_loader,
+
+            criterion=criterion,
+
+            device=device,
+
+        )
+
+        train_losses.append(train_loss)
+        validation_losses.append(validation_loss)
+
+        train_accuracies.append(train_accuracy)
+        validation_accuracies.append(validation_accuracy)
+
+        scheduler.step(validation_loss)
+
+        print(
+            f"Train Loss : {train_loss:.4f} | "
+            f"Train Accuracy : {train_accuracy:.2f}%"
+        )
+
+        print(
+            f"Validation Loss : {validation_loss:.4f} | "
+            f"Validation Accuracy : {validation_accuracy:.2f}%"
+        )
+
+        # --------------------------------------
+        # Save Best Model
+        # --------------------------------------
+
+        if validation_loss < best_validation_loss:
+
+            best_validation_loss = validation_loss
+
+            early_stop_counter = 0
+
+            torch.save(
+
+                model.state_dict(),
+
+                Config.SAVE_MODEL_PATH,
+
+            )
+
+            print("\nBest Model Saved.")
+
+        else:
+
+            early_stop_counter += 1
+
+            print(
+
+                f"\nNo Improvement ({early_stop_counter}/{Config.PATIENCE})"
+
+            )
+
+        # --------------------------------------
+        # Early Stopping
+        # --------------------------------------
+
+        if early_stop_counter >= Config.PATIENCE:
+
+            print("\nEarly Stopping Activated.")
+
+            break
+
+        plot_training_history(
+    train_losses=train_losses,
+    validation_losses=validation_losses,
+    train_accuracies=train_accuracies,
+    validation_accuracies=validation_accuracies,
+)
+# ==========================================
+# Test Best Model
+# ==========================================
+
+def test():
+
+    print("\n" + "=" * 60)
+    print("Loading Best Model ...")
+    print("=" * 60)
+
+    model.load_state_dict(
+
+        torch.load(
+
+            Config.SAVE_MODEL_PATH,
+
+            map_location=device,
+
+        )
+
+    )
+
+    results = evaluate(
+
+        model=model,
+
+        dataloader=test_loader,
+
+        device=device,
+
+    )
+
+    print("\n")
+
+    print("=" * 60)
+
+    print("Final Test Results")
+
+    print("=" * 60)
+
+    print(
+
+        f"Accuracy  : {results['accuracy']:.4f}"
+
+    )
+
+    print(
+
+        f"Precision : {results['precision']:.4f}"
+
+    )
+
+    print(
+
+        f"Recall    : {results['recall']:.4f}"
+
+    )
+
+    print(
+
+        f"F1 Score  : {results['f1']:.4f}"
+
+    )
+
+    print("=" * 60)
+
+
+# ==========================================
+# Main
+# ==========================================
+
+def main():
+
+    train()
+
+    test()
+
+
+if __name__ == "__main__":
+
+    main()
